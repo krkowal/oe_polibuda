@@ -8,11 +8,16 @@ from proj1.Mutation import Mutation
 
 class Population:
 
-    def __init__(self, population_count, value_func_name, min_range, max_range, selection_name, selection_param,
-                 crossover_name, crossover_param, mutation_name, mutation_param, inversion_param, has_elitism=False,
-                 elitism_count=0,
-                 is_maximization=False):
+    def __init__(self, population_count: int, value_func_name: str, epochs: int, min_range: float, max_range: float,
+                 selection_name: str,
+                 selection_param: int,
+                 crossover_name: str, crossover_param: float, mutation_name: str, mutation_param: float,
+                 inversion_param: float,
+                 has_elitism: bool = False,
+                 elitism_count: int = 0,
+                 is_maximization: bool = False):
         self._is_maximization = is_maximization
+        self._epochs = epochs
         self._population_count = population_count
         self._value_func_name = value_func_name
         self._value_func = VALUE_FUNC_DIR[value_func_name]
@@ -29,23 +34,24 @@ class Population:
         self._chromosomes_list = [Chromosome(gens_count=self._gens_count, min_range=min_range, max_range=max_range) for
                                   _ in range(population_count)]
 
-    def evaluate_chromosomes(self):
+    def evaluate_chromosomes(self) -> list[tuple[Chromosome, float]]:
         return list(zip(self._chromosomes_list,
                         list(map(lambda chromosome: chromosome.get_value(self._value_func), self._chromosomes_list))))
 
     def population_loop(self):
-        selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
-        elite_chromosomes_list = []
-        if self._has_elitism:
-            elite_chromosomes_list = selected_chromosomes_list[:self._elitism_count]
-            selected_chromosomes_list = selected_chromosomes_list[self._elitism_count:]
+        for i in range(self._epochs):
+            selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
+            elite_chromosomes_list = []
+            if self._has_elitism:
+                elite_chromosomes_list = selected_chromosomes_list[:self._elitism_count]
+                selected_chromosomes_list = selected_chromosomes_list[self._elitism_count:]
 
-        crossed_chromosome_list = self._crossover.cross(selected_chromosomes_list)
+            crossed_chromosome_list = self._crossover.cross(selected_chromosomes_list)
 
-        crossed_chromosome_list = crossed_chromosome_list[:self._population_count - self._elitism_count]
-        mutated_chromosomes_list = self._mutation.mutate(crossed_chromosome_list)
+            crossed_chromosome_list = crossed_chromosome_list[:self._population_count - self._elitism_count]
+            mutated_chromosomes_list = self._mutation.mutate(crossed_chromosome_list)
 
-        inverted_chromosomes = self._inversion.invert(mutated_chromosomes_list)
+            inverted_chromosomes = self._inversion.invert(mutated_chromosomes_list)
 
-        elite_chromosomes_list.extend(inverted_chromosomes)
-        self._chromosomes_list = elite_chromosomes_list
+            elite_chromosomes_list.extend(inverted_chromosomes)
+            self._chromosomes_list = elite_chromosomes_list

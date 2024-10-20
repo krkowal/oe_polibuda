@@ -1,4 +1,5 @@
 import random
+from typing import Callable
 
 from proj1 import constants
 from proj1.Chromosome import Chromosome
@@ -9,20 +10,20 @@ class Mutation:
         self._mutation_name = mutation_name
         self._mutation_param = mutation_param
 
-        MUTATION_FUNC_DIR = {
+        MUTATION_FUNC_DIR: dir[str, Callable] = {
             constants.ONE_POINT: self._one_point_mutation
             , constants.TWO_POINT: self._two_point_mutation
             , constants.BOUNDARY: self._boundary_mutation
         }
         self._mutation_func = MUTATION_FUNC_DIR[mutation_name]
 
-    def _one_point_mutation(self, gene):
+    def _one_point_mutation(self, gene) -> str:
         return self.__n_point_mutation(gene, 1)
 
-    def _two_point_mutation(self, gene):
+    def _two_point_mutation(self, gene) -> str:
         return self.__n_point_mutation(gene, 2)
 
-    def __n_point_mutation(self, gene, n, position_set=None):
+    def __n_point_mutation(self, gene, n, position_set=None) -> str:
         binary_list = list(gene)
 
         if position_set is None:
@@ -36,11 +37,11 @@ class Mutation:
             binary_list[point] = '1' if binary_list[point] == '0' else '0'
         return "".join(binary_list)
 
-    def _boundary_mutation(self, gene):
+    def _boundary_mutation(self, gene) -> str:
         position = {random.randint(0, 1) - 1}
         return self.__n_point_mutation(gene, 1, position_set=position)
 
-    def mutate(self, chromosomes_list):
+    def mutate(self, chromosomes_list) -> list[Chromosome]:
         new_chromosomes = []
         for chromosome in chromosomes_list:
             new_genes = []

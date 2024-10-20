@@ -26,13 +26,13 @@ class Selection:
         self._has_elitism = has_elitism
         self._elitism_count = elitism_count
 
-    def best_selection(self):
+    def best_selection(self) -> list[Chromosome]:
         sorted_chromosome_list = get_sorted_chromosome_values(self.__current_chromosome_list,
                                                               is_reversed=self._is_maximization)
         # print(sorted_chromosome_list)
         return sorted_chromosome_list[:self._param - self._elitism_count]
 
-    def roulette(self):
+    def roulette(self) -> set[Chromosome]:
         fitness_values = [value for chromosome, value in self.__current_chromosome_list] if self._is_maximization else [
             1 / value for chromosome, value in self.__current_chromosome_list]
         total_fitness = sum(fitness_values)
@@ -56,7 +56,7 @@ class Selection:
                     break
         return selected_chromosomes
 
-    def tournament(self):
+    def tournament(self) -> list[Chromosome]:
         random.shuffle(self.__current_chromosome_list)
         groups_list = [self.__current_chromosome_list[i:i + self._param] for i in
                        range(0, len(self.__current_chromosome_list), self._param)]
@@ -68,7 +68,7 @@ class Selection:
 
         return winner_chromosome_list
 
-    def select(self, chromosome_list):
+    def select(self, chromosome_list) -> list[Chromosome]:
         if self._has_elitism:
             sorted_chromosomes_list = get_sorted_chromosome_values(chromosome_list, self._is_maximization)
             elite_chromosomes_list = sorted_chromosomes_list[:self._elitism_count]

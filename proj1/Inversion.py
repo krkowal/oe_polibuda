@@ -7,7 +7,7 @@ class Inversion:
     def __init__(self, inversion_param):
         self._inversion_param = inversion_param
 
-    def invert(self, chromosomes_list):
+    def invert(self, chromosomes_list) -> list[Chromosome]:
         new_chromosomes_list = []
         for chromosome in chromosomes_list:
             new_genes = []

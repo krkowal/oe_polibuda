@@ -20,15 +20,15 @@ class Chromosome:
         self._gens_list = ["".join([str(randint(0, 1)) for _ in range(self._gens_length)]) for _ in
                            range(gens_count)] if gens is None else gens
 
-    def get_variables_values(self):
+    def get_variables_values(self) -> list[float]:
         return list(map(lambda gen: self._min_range + int(gen, 2) * self._gen_range / (2 ** self._gens_length - 1),
                         self._gens_list))
 
     @classmethod
-    def from_crossover_and_mutations(cls, parent_chromosome: 'Chromosome', genes_list: List[str]):
+    def from_crossover_and_mutations(cls, parent_chromosome: 'Chromosome', genes_list: List[str]) -> 'Chromosome':
         return cls(*parent_chromosome.get_init_params(), genes_list)
 
-    def get_value(self, func):
+    def get_value(self, func) -> float:
         return func(self.get_variables_values())
 
     def __str__(self):
@@ -39,8 +39,8 @@ class Chromosome:
     def get_init_params(self):
         return [self._gens_count, self._min_range, self._max_range, self._gens_length]
 
-    def get_genes_list(self):
+    def get_genes_list(self) -> list[str]:
         return self._gens_list
 
-    def get_gens_length(self):
+    def get_gens_length(self) -> int:
         return self._gens_length
