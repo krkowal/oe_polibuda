@@ -43,11 +43,11 @@ class Population:
             selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
             elite_chromosomes_list = []
             if self._has_elitism:
-                elite_chromosomes_list = selected_chromosomes_list[:self._elitism_count]
+                elite_chromosomes_list = [chromosome for chromosome, value in
+                                          selected_chromosomes_list[:self._elitism_count]]
                 selected_chromosomes_list = selected_chromosomes_list[self._elitism_count:]
 
             crossed_chromosome_list = self._crossover.cross(selected_chromosomes_list)
-
             crossed_chromosome_list = crossed_chromosome_list[:self._population_count - self._elitism_count]
             mutated_chromosomes_list = self._mutation.mutate(crossed_chromosome_list)
 

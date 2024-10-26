@@ -68,11 +68,10 @@ class Selection:
 
         return winner_chromosome_list
 
-    def select(self, chromosome_list) -> list[Chromosome]:
+    def select(self, chromosome_list):
         if self._has_elitism:
             sorted_chromosomes_list = get_sorted_chromosome_values(chromosome_list, self._is_maximization)
             elite_chromosomes_list = sorted_chromosomes_list[:self._elitism_count]
-            print(elite_chromosomes_list)
             self.__current_chromosome_list = sorted_chromosomes_list[self._elitism_count:]
             elite_chromosomes_list.extend(self._selection_func())
             return elite_chromosomes_list
