@@ -1,5 +1,5 @@
 from Chromosome import Chromosome
-from constants import GENS_COUNT_DIR, VALUE_FUNC_DIR
+from constants import VALUE_FUNC_DIR
 from Selection import Selection
 from proj1.Crossover import Crossover
 from proj1.Inversion import Inversion
@@ -12,7 +12,7 @@ class Population:
                  selection_name: str,
                  selection_param: int,
                  crossover_name: str, crossover_param: float, mutation_name: str, mutation_param: float,
-                 inversion_param: float,
+                 inversion_param: float, genes_count: int,
                  has_elitism: bool = False,
                  elitism_count: int = 0,
                  is_maximization: bool = False):
@@ -21,7 +21,7 @@ class Population:
         self._population_count = population_count
         self._value_func_name = value_func_name
         self._value_func = VALUE_FUNC_DIR[value_func_name]
-        self._gens_count = GENS_COUNT_DIR[value_func_name]
+        self._gens_count = genes_count
         self._min_range = min_range
         self._max_range = max_range
         self._selection = Selection(selection_name, selection_param, has_elitism=has_elitism,
@@ -39,6 +39,8 @@ class Population:
                         list(map(lambda chromosome: chromosome.get_value(self._value_func), self._chromosomes_list))))
 
     def population_loop(self):
+        metrics = []
+        values = []
         for i in range(self._epochs):
             selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
             elite_chromosomes_list = []
@@ -55,3 +57,11 @@ class Population:
 
             elite_chromosomes_list.extend(inverted_chromosomes)
             self._chromosomes_list = elite_chromosomes_list
+
+            print(i)
+            print(self.evaluate_chromosomes())
+            values = [value for _, value in self.evaluate_chromosomes()]
+
+            print(values)
+
+        return max(values) if self._is_maximization else min(values)
