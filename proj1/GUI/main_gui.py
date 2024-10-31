@@ -1,5 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
+import sys
+from proj1 import constants
+from proj1.Population import Population
+sys.path.append("proj1")
+import numpy as np
 
 
 class App(tk.Tk):
@@ -8,17 +13,15 @@ class App(tk.Tk):
         self.title("Genetic Algorithm with Timer")
         self.geometry("300x700")
 
-        # Initialize timer variables
         self.elapsed_time = 0
         self.timer_running = False
         self.timer_job = None
 
         self.placeholders = [
-            'Begin of the range - a', 'End of the range - b', 'Population amount',
-            'Number of bits', 'Epochs amount', 'Best and tournament chromosome amount',
-            'Elite Strategy amount', 'Cross probability', 'Mutation probability', 'Inversion probability'
+            'Population amount', 'Begin of the range - a', 'End of the range - b',
+            'Selection parameter', 'Crossover probability', 'Mutation probability',
+            'Inversion probability', 'Elite Strategy amount', 'Epochs amount', 'Genes count'
         ]
-
         self.create_widgets()
 
     def create_widgets(self):
@@ -34,15 +37,19 @@ class App(tk.Tk):
 
         self.combo_labels_text = [
             "Choose selection method",
-            "Choose cross method",
-            "Choose mutation method"
+            "Choose crossover method",
+            "Choose mutation method",
+            "Choose function"
         ]
+
         self.combobox_values = [
-            ["BEST", "ROULETTE", "TOURNAMENT"],
-            ["ONE_POINT", "TWO_POINT", "THREE_POINTS", "HOMO"],
-            ["ONE_POINT", "TWO_POINT"]
+            [constants.BEST, constants.ROULETTE, constants.TOURNAMENT],
+            [constants.ONE_POINT, constants.TWO_POINT, constants.UNIFORM, constants.DISCRETE],
+            [constants.ONE_POINT, constants.TWO_POINT],
+            list(constants.VALUE_FUNC_DIR.keys())
         ]
-        default_values = ["BEST", "ONE_POINT", "ONE_POINT"]
+
+        default_values = [constants.BEST, constants.ONE_POINT, constants.ONE_POINT, constants.PLAIN_FUNCTION]
 
         self.comboboxes = []
         for label_text, values, default in zip(self.combo_labels_text, self.combobox_values, default_values):
@@ -54,20 +61,15 @@ class App(tk.Tk):
             self.comboboxes.append(combobox)
 
         self.checkbox_var = tk.BooleanVar()
-        self.checkbox = tk.Checkbutton(self, text="Check me", variable=self.checkbox_var)
+        self.checkbox = tk.Checkbutton(self, text="Maximization", variable=self.checkbox_var)
         self.checkbox.pack(pady=5)
 
-        self.function_var = tk.StringVar(value="Function1")  # Default to "Function1"
-        function1_radio = tk.Radiobutton(self, text="Function1", variable=self.function_var, value="Function1")
-        function2_radio = tk.Radiobutton(self, text="Function2", variable=self.function_var, value="Function2")
-        function1_radio.pack(pady=5)
-        function2_radio.pack(pady=5)
+        self.checkbox_var2 = tk.BooleanVar()
+        self.elitism_checkbox = tk.Checkbutton(self, text="Elitism", variable=self.checkbox_var2)
+        self.elitism_checkbox.pack(pady=5)
 
         start_button = tk.Button(self, text="Start", command=self.start_timer)
         start_button.pack(pady=10, fill=tk.X, padx=10)
-
-        stop_button = tk.Button(self, text="Stop", command=self.stop_timer)
-        stop_button.pack(pady=10, fill=tk.X, padx=10)
 
     def set_placeholder(self, widget, placeholder):
         widget.insert(0, placeholder)
@@ -98,21 +100,46 @@ class App(tk.Tk):
 
     def update_timer(self):
         if self.timer_running:
-            self.elapsed_time += 1
+            self.elapsed_time += 0.01
             self.timer_label.config(text=f"Elapsed Time: {self.elapsed_time}s")
 
-            self.timer_job = self.after(1000, self.update_timer)
+            self.timer_job = self.after(10, self.update_timer)
 
     def on_button_click(self):
         textbox_values = [textbox.get() for textbox in self.textboxes]
         combobox_values = [combobox.get() for combobox in self.comboboxes]
         checkbox_value = self.checkbox_var.get()
-        selected_function = self.function_var.get()
+        checkbox_value2 = self.checkbox_var2.get()
 
 
-        messagebox.showinfo("Collected Data", f"Textbox Values: {textbox_values}\n"
-                                              f"Combobox Values: {combobox_values}\n"
-                                              f"Checkbox Value: {checkbox_value}")
+        selection_method = combobox_values[0]
+        crossover_method = combobox_values[1]
+        mutation_method = combobox_values[2]
+        selected_function_key = combobox_values[3]
+
+        pop = Population(
+            population_count=int(textbox_values[0]),
+            max_range=int(textbox_values[2]),
+            min_range=int(textbox_values[1]),
+            value_func_name=selected_function_key,
+            selection_name=selection_method,
+            selection_param=int(textbox_values[3]),
+            is_maximization=checkbox_value,
+            crossover_name=crossover_method,
+            crossover_param=float(textbox_values[4]),
+            mutation_name=mutation_method,
+            mutation_param=float(textbox_values[5]),
+            inversion_param=float(textbox_values[6]),
+            has_elitism=checkbox_value2,
+            elitism_count=int(textbox_values[7]),
+            epochs=int(textbox_values[8]),
+            genes_count=int(textbox_values[9])
+        )
+
+        all_values, best_values, final_value = pop.population_loop()
+        print("Final Value:", final_value)
+        self.stop_timer()
+
 
 if __name__ == "__main__":
     app = App()
