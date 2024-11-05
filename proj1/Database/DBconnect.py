@@ -7,15 +7,14 @@ DB_USER = "myuser"
 DB_PASSWORD = "mypassword"
 
 
-def connect_and_insert():
+def connect_and_insert(data):
     try:
-        # Create a MongoDB client
         client = MongoClient(
             f"mongodb://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/"
         )
         db = client.mydatabase
         collection = db.mycollection
-        sample_data = {"name": "Alice", "age": 25}
+        sample_data = {"Final Value": data}
         collection.insert_one(sample_data)
 
         print("Connected to MongoDB and inserted")

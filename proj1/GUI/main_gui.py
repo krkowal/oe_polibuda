@@ -1,8 +1,40 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sys
+from tkinter import messagebox
 from proj1 import constants
-from proj1.Population import Population
+try:
+    from Population import Population
+except ImportError:
+    import sys
+    sys.path.append(sys.path[0] + '/..')
+    from Population import Population
+try:
+    from Plotter import Plotter
+except ImportError:
+    import sys
+    sys.path.append(sys.path[0] + '/..')
+    from Plotter import Plotter
+sys.path.append('../Database')
+try:
+    from CSVFileWrite import CSVDataSaver
+except ImportError:
+    import sys
+    sys.path.append(sys.path[0] + '/..')
+    from Database.CSVFileWrite import CSVDataSaver
+try:
+    from DBconnect import connect_and_insert
+except ImportError:
+    import sys
+    sys.path.append(sys.path[0] + '/..')
+    from Database.DBconnect import connect_and_insert
+
+
+
+
+
+
+
 sys.path.append("proj1")
 import numpy as np
 
@@ -10,8 +42,8 @@ import numpy as np
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Genetic Algorithm with Timer")
-        self.geometry("300x700")
+        self.title("Genetic Algorithm")
+        self.geometry("400x800")
 
         self.elapsed_time = 0
         self.timer_running = False
@@ -100,10 +132,10 @@ class App(tk.Tk):
 
     def update_timer(self):
         if self.timer_running:
-            self.elapsed_time += 0.01
+            self.elapsed_time += 0.001
             self.timer_label.config(text=f"Elapsed Time: {self.elapsed_time}s")
 
-            self.timer_job = self.after(10, self.update_timer)
+            self.timer_job = self.after(1, self.update_timer)
 
     def on_button_click(self):
         textbox_values = [textbox.get() for textbox in self.textboxes]
@@ -137,10 +169,23 @@ class App(tk.Tk):
         )
 
         all_values, best_values, final_value = pop.population_loop()
-        print("Final Value:", final_value)
         self.stop_timer()
+        print("Final Value:", final_value)
+        data = [final_value]
+        test = CSVDataSaver(data)
+        test.save_to_csv()
+        connect_and_insert(final_value)
+        messagebox.showinfo("Final Value", "Final Value: " + str(final_value))
+
+        plotter = Plotter(output_dir='output')
+        plotter.save_best_values(best_values)
+        plotter.save_all_values(all_values)
+        plotter.save_mean_and_std(all_values)
+        plotter.save_best_value_and_std(best_values, all_values)
+
 
 
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+
