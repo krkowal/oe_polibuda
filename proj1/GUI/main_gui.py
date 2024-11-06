@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 import sys
 from tkinter import messagebox
 from proj1 import constants
+import threading
 try:
     from Population import Population
 except ImportError:
@@ -49,7 +50,7 @@ class App(tk.Tk):
         self.timer_running = False
         self.timer_job = None
 
-        self.placeholders = [
+        self.textbox_labels = [
             'Population amount', 'Begin of the range - a', 'End of the range - b',
             'Selection parameter', 'Crossover probability', 'Mutation probability',
             'Inversion probability', 'Elite Strategy amount', 'Epochs amount', 'Genes count'
@@ -57,14 +58,16 @@ class App(tk.Tk):
         self.create_widgets()
 
     def create_widgets(self):
-        self.timer_label = tk.Label(self, text="Elapsed Time: 0s", font=("Arial", 12))
-        self.timer_label.pack(pady=10)
-
         self.textboxes = []
-        for placeholder in self.placeholders:
-            textbox = tk.Entry(self)
-            textbox.pack(pady=5, fill=tk.X, padx=10)
-            self.set_placeholder(textbox, placeholder)
+        for label_text in self.textbox_labels:
+            frame = tk.Frame(self)
+            frame.pack(pady=5, fill=tk.X, padx=10)
+
+            label = tk.Label(frame, text=label_text, width=20, anchor='w')  # Align text to the left
+            label.pack(side=tk.LEFT)
+
+            textbox = tk.Entry(frame)
+            textbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
             self.textboxes.append(textbox)
 
         self.combo_labels_text = [
@@ -81,7 +84,7 @@ class App(tk.Tk):
             list(constants.VALUE_FUNC_DIR.keys())
         ]
 
-        default_values = [constants.BEST, constants.ONE_POINT, constants.ONE_POINT, constants.PLAIN_FUNCTION]
+        default_values = [constants.BEST, constants.ONE_POINT, constants.ONE_POINT, constants.STYBLISNKI_TANG_FUNCTION]
 
         self.comboboxes = []
         for label_text, values, default in zip(self.combo_labels_text, self.combobox_values, default_values):
@@ -103,6 +106,9 @@ class App(tk.Tk):
         start_button = tk.Button(self, text="Start", command=self.start_timer)
         start_button.pack(pady=10, fill=tk.X, padx=10)
 
+        self.timer_label = tk.Label(self, text="Elapsed Time: 0s", font=("Arial", 12))
+        self.timer_label.pack(pady=10)
+
     def set_placeholder(self, widget, placeholder):
         widget.insert(0, placeholder)
         widget.bind("<FocusIn>", lambda event: self.clear_placeholder(event, placeholder))
@@ -117,12 +123,14 @@ class App(tk.Tk):
             event.widget.insert(0, placeholder)
 
     def start_timer(self):
-        if not self.timer_running:
-            self.elapsed_time = 0
-            self.timer_running = True
-            self.update_timer()
+        # Stop and reset timer before starting
+        self.stop_timer()
+        self.elapsed_time = 0
+        self.timer_running = True
+        self.update_timer()
 
-        self.on_button_click()
+        # Run Population calculation in a new thread
+        threading.Thread(target=self.on_button_click).start()
 
     def stop_timer(self):
         if self.timer_running:
@@ -132,10 +140,9 @@ class App(tk.Tk):
 
     def update_timer(self):
         if self.timer_running:
-            self.elapsed_time += 0.001
-            self.timer_label.config(text=f"Elapsed Time: {self.elapsed_time}s")
-
-            self.timer_job = self.after(1, self.update_timer)
+            self.elapsed_time += 0.01
+            self.timer_label.config(text=f"Elapsed Time: {self.elapsed_time:.2f}s")
+            self.timer_job = self.after(10, self.update_timer)
 
     def on_button_click(self):
         textbox_values = [textbox.get() for textbox in self.textboxes]
@@ -170,14 +177,13 @@ class App(tk.Tk):
 
         all_values, best_values, final_value = pop.population_loop()
         self.stop_timer()
-        print("Final Value:", final_value)
-        data = [final_value]
-        test = CSVDataSaver(data)
+        #print("Final Value:", final_value)
+        test = CSVDataSaver(all_values)
         test.save_to_csv()
         connect_and_insert(final_value)
         messagebox.showinfo("Final Value", "Final Value: " + str(final_value))
 
-        plotter = Plotter(output_dir='output')
+        plotter = Plotter(output_dir='../Results')
         plotter.save_best_values(best_values)
         plotter.save_all_values(all_values)
         plotter.save_mean_and_std(all_values)
