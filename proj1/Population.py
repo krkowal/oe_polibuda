@@ -1,3 +1,5 @@
+import numpy as np
+
 from Chromosome import Chromosome
 from constants import VALUE_FUNC_DIR
 from Selection import Selection
@@ -38,9 +40,10 @@ class Population:
         return list(zip(self._chromosomes_list,
                         list(map(lambda chromosome: chromosome.get_value(self._value_func), self._chromosomes_list))))
 
-    def population_loop(self):
-        metrics = []
-        values = []
+    def population_loop(self) -> tuple[list[list[float]], list[float], int | float]:
+        all_values = []
+        final_value = 0
+        best_values = []
         for i in range(self._epochs):
             selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
             elite_chromosomes_list = []
@@ -58,10 +61,17 @@ class Population:
             elite_chromosomes_list.extend(inverted_chromosomes)
             self._chromosomes_list = elite_chromosomes_list
 
-            print(i)
-            print(self.evaluate_chromosomes())
-            values = [value for _, value in self.evaluate_chromosomes()]
+            evaluation = self.evaluate_chromosomes()
+            values = [value for _, value in evaluation]
 
-            print(values)
+            final_value = max(values) if self._is_maximization else min(values)
+            best_values.append(max(values) if self._is_maximization else min(values))
+            all_values.append(values)
 
-        return max(values) if self._is_maximization else min(values)
+            #print(f"Epoch {i + 1}/{self._epochs}")
+            #print(values)
+            #print(f"Worst value in this epoch: {min(values) if self._is_maximization else max(values)}")
+            #print(f"Best value in this epoch: {max(values) if self._is_maximization else min(values) }")
+            #print(f"Mean value in this epoch: {sum(values) / len(values)}")
+
+        return all_values, best_values, final_value

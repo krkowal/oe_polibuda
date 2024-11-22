@@ -1,4 +1,6 @@
 import csv
+import sys
+import os
 from datetime import datetime
 
 
@@ -8,8 +10,13 @@ class CSVDataSaver:
 
     def save_to_csv(self):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"data_{timestamp}.csv"
+        directory = os.path.join(sys.path[0], "..", "Results")
+        os.makedirs(directory, exist_ok=True)
+        filename = os.path.join(directory, f"data_{timestamp}.csv")
+
         with open(filename, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerows(self.data)
+            for item in self.data:
+                writer.writerow([item])
+
         print(f"Data saved to {filename}")
