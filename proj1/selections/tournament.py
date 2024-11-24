@@ -11,9 +11,9 @@ class TournamentSelection(Selection):
         self._param = param
 
     def selection_function(self):
-        random.shuffle(self.__current_chromosome_list)
-        groups_list = [self.__current_chromosome_list[i:i + self._param] for i in
-                       range(0, len(self.__current_chromosome_list), self._param)]
+        random.shuffle(self.current_chromosome_list)
+        groups_list = [self.current_chromosome_list[i:i + self._param] for i in
+                       range(0, len(self.current_chromosome_list), self._param)]
 
         winner_chromosome_list = [group[0] for group in
                                   [get_sorted_chromosome_values(shuffled_group, is_reversed=self._is_maximization) for

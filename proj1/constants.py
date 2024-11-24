@@ -16,6 +16,9 @@ DISCRETE = "discrete"
 
 BOUNDARY = "boundary"
 
-#PLAIN_FUNCTION = "plain"
+# PLAIN_FUNCTION = "plain"
 STYBLISNKI_TANG_FUNCTION = "styblinski"
 WEIERSTRASS_FUNCTION = "shifted_and_rotated_weierstrass_function"
+
+REAL = "real"
+BINARY = "binary"

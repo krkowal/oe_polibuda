@@ -1,4 +1,4 @@
-from proj1.Chromosome import Chromosome
+from proj1.chromosomes.binary import BinaryChromosome
 from proj1.crossovers.crossover import Crossover
 import random
 
@@ -8,7 +8,7 @@ class UniformCrossover(Crossover):
         super().__init__(population_count, elite_count)
         self._crossover_param = crossover_param
 
-    def _crossover_function(self, chromosome_list: list[Chromosome]) -> list[Chromosome]:
+    def _crossover_function(self, chromosome_list: list[BinaryChromosome]) -> list[BinaryChromosome]:
         new_genes_first = []
         new_genes_second = []
         first_chromosome = chromosome_list[0]
@@ -27,6 +27,7 @@ class UniformCrossover(Crossover):
             new_genes_first.append(new_first_gene)
             new_genes_second.append(new_second_gene)
 
-        return [Chromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome, genes_list=new_genes_first),
-                Chromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
-                                                        genes_list=new_genes_second)]
+        return [BinaryChromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
+                                                              genes_list=new_genes_first),
+                BinaryChromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
+                                                              genes_list=new_genes_second)]

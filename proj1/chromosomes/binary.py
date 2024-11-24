@@ -2,16 +2,17 @@ from random import randint
 from math import log2, ceil
 from typing import List
 
-from constants import ACCURACY
+from proj1.chromosomes.chromosome import Chromosome
+from proj1.constants import ACCURACY
 
 
 def calculate_gens_length(gen_range, accuracy):
     return ceil(log2(gen_range * 10 ** accuracy) + log2(1))
 
 
-class Chromosome:
-    def __init__(self, gens_count, min_range, max_range, gens_length=None, gens=None
-                 ):
+class BinaryChromosome(Chromosome):
+    def __init__(self, gens_count, min_range, max_range, gens_length=None, gens=None):
+        super().__init__()
         self._min_range = min_range
         self._max_range = max_range
         self._gen_range = max_range - min_range
@@ -25,7 +26,8 @@ class Chromosome:
                         self._gens_list))
 
     @classmethod
-    def from_crossover_and_mutations(cls, parent_chromosome: 'Chromosome', genes_list: List[str]) -> 'Chromosome':
+    def from_crossover_and_mutations(cls, parent_chromosome: 'BinaryChromosome',
+                                     genes_list: List[str]) -> 'BinaryChromosome':
         return cls(*parent_chromosome.get_init_params(), genes_list)
 
     def get_value(self, func) -> float:

@@ -10,8 +10,8 @@ class RouletteSelection(Selection):
         self._param = param
 
     def selection_function(self):
-        fitness_values = [value for chromosome, value in self.__current_chromosome_list] if self._is_maximization else [
-            1 / value for chromosome, value in self.__current_chromosome_list]
+        fitness_values = [value for chromosome, value in self.current_chromosome_list] if self._is_maximization else [
+            1 / value for chromosome, value in self.current_chromosome_list]
         total_fitness = sum(fitness_values)
         relative_fitness = [fitness / total_fitness for fitness in fitness_values]
         cumulative_probabilities = []
@@ -25,6 +25,6 @@ class RouletteSelection(Selection):
             random_value = random.random()
             for i, cumulative_probability in enumerate(cumulative_probabilities):
                 if random_value < cumulative_probability:
-                    selected_chromosomes.add(self.__current_chromosome_list[i])
+                    selected_chromosomes.add(self.current_chromosome_list[i])
                     break
         return selected_chromosomes

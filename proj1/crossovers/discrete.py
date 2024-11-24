@@ -1,4 +1,4 @@
-from proj1.Chromosome import Chromosome
+from proj1.chromosomes.binary import BinaryChromosome
 from proj1.crossovers.crossover import Crossover
 import random
 
@@ -8,7 +8,7 @@ class DiscreteCrossover(Crossover):
         super().__init__(population_count, elite_count)
         self._crossover_param = crossover_param
 
-    def _crossover_function(self, chromosome_list: list[Chromosome]) -> list[Chromosome]:
+    def _crossover_function(self, chromosome_list: list[BinaryChromosome]) -> list[BinaryChromosome]:
         new_genes = []
         first_chromosome = chromosome_list[0]
         second_chromosome = chromosome_list[1]
@@ -21,4 +21,4 @@ class DiscreteCrossover(Crossover):
                 else:
                     new_gene += second
             new_genes.append(new_gene)
-        return [Chromosome.from_crossover_and_mutations(first_chromosome, new_genes)]
+        return [BinaryChromosome.from_crossover_and_mutations(first_chromosome, new_genes)]

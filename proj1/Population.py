@@ -1,16 +1,18 @@
 import numpy as np
 
-from Chromosome import Chromosome
 from constants import VALUE_FUNC_DIR
-from Selection import Selection
-from proj1.Crossover import Crossover
 from proj1.Inversion import Inversion
-from proj1.Mutation import Mutation
+from proj1.chromosomes.chromosome import Chromosome
+from proj1.chromosomes.chromosome_list_factory import ChromosomeListFactory
+from proj1.crossovers.crossover_factory import CrossoverFactory
+from proj1.mutations.mutation_factory import MutationFactory
+from proj1.selections.selection_factory import SelectionFactory
 
 
 class Population:
 
-    def __init__(self, population_count: int, value_func_name: str, epochs: int, min_range: float, max_range: float,
+    def __init__(self, chromosome_type, population_count: int, value_func_name: str, epochs: int, min_range: float,
+                 max_range: float,
                  selection_name: str,
                  selection_param: int,
                  crossover_name: str, crossover_param: float, mutation_name: str, mutation_param: float,
@@ -26,15 +28,24 @@ class Population:
         self._gens_count = genes_count
         self._min_range = min_range
         self._max_range = max_range
-        self._selection = Selection(selection_name, selection_param, has_elitism=has_elitism,
-                                    elitism_count=elitism_count, is_maximization=is_maximization)
-        self._crossover = Crossover(crossover_name, population_count, crossover_param, elite_count=elitism_count)
-        self._mutation = Mutation(mutation_name, mutation_param)
+        # self._selection = Selection(selection_name, selection_param, has_elitism=has_elitism,
+        #                             elitism_count=elitism_count, is_maximization=is_maximization)
+        self._selection = SelectionFactory.get_selection(selection_name, selection_param, has_elitism=has_elitism,
+                                                         elitism_count=elitism_count,
+                                                         is_maximization=is_maximization)
+        self._crossover = CrossoverFactory.get_crossover(crossover_name, population_count, crossover_param,
+                                                         elite_count=elitism_count)
+        self._mutation = MutationFactory.get_mutation(mutation_name, mutation_param)
         self._inversion = Inversion(inversion_param)
         self._has_elitism = has_elitism
         self._elitism_count = elitism_count
-        self._chromosomes_list = [Chromosome(gens_count=self._gens_count, min_range=min_range, max_range=max_range) for
-                                  _ in range(population_count)]
+        # self._chromosomes_list = [
+        #     BinaryChromosome(gens_count=self._gens_count, min_range=min_range, max_range=max_range) for
+        #     _ in range(population_count)]
+        self._chromosomes_list = ChromosomeListFactory.get_chromosome_list(chromosome_type,
+                                                                           population_count=population_count,
+                                                                           gens_count=genes_count,
+                                                                           min_range=min_range, max_range=max_range)
 
     def evaluate_chromosomes(self) -> list[tuple[Chromosome, float]]:
         return list(zip(self._chromosomes_list,
@@ -68,10 +79,10 @@ class Population:
             best_values.append(max(values) if self._is_maximization else min(values))
             all_values.append(values)
 
-            #print(f"Epoch {i + 1}/{self._epochs}")
-            #print(values)
-            #print(f"Worst value in this epoch: {min(values) if self._is_maximization else max(values)}")
-            #print(f"Best value in this epoch: {max(values) if self._is_maximization else min(values) }")
-            #print(f"Mean value in this epoch: {sum(values) / len(values)}")
+            # print(f"Epoch {i + 1}/{self._epochs}")
+            # print(values)
+            # print(f"Worst value in this epoch: {min(values) if self._is_maximization else max(values)}")
+            # print(f"Best value in this epoch: {max(values) if self._is_maximization else min(values) }")
+            # print(f"Mean value in this epoch: {sum(values) / len(values)}")
 
         return all_values, best_values, final_value

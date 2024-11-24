@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from random import random
+import random
 
-from proj1.Chromosome import Chromosome
+from proj1.chromosomes.binary import BinaryChromosome
 from proj1.crossovers.crossover import Crossover
 
 
@@ -10,7 +10,7 @@ class NPointCrossover(Crossover, ABC):
     def __init__(self, population_count, elite_count=0):
         super().__init__(population_count, elite_count)
 
-    def n_point_crossover(self, chromosome_list: list[Chromosome], n) -> list[Chromosome]:
+    def n_point_crossover(self, chromosome_list: list[BinaryChromosome], n) -> list[BinaryChromosome]:
         new_genes_first = []
         new_genes_second = []
         first_chromosome = chromosome_list[0]
@@ -43,10 +43,11 @@ class NPointCrossover(Crossover, ABC):
             new_genes_first.append(new_first_gene)
             new_genes_second.append(new_second_gene)
 
-        return [Chromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome, genes_list=new_genes_first),
-                Chromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
-                                                        genes_list=new_genes_second)]
+        return [BinaryChromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
+                                                              genes_list=new_genes_first),
+                BinaryChromosome.from_crossover_and_mutations(parent_chromosome=first_chromosome,
+                                                              genes_list=new_genes_second)]
 
     @abstractmethod
-    def _crossover_function(self, chromosome_list: list[Chromosome]) -> list[Chromosome]:
+    def _crossover_function(self, chromosome_list: list[BinaryChromosome]) -> list[BinaryChromosome]:
         pass
