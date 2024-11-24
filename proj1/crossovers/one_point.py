@@ -2,7 +2,7 @@ from proj1.Chromosome import Chromosome
 from proj1.crossovers.n_point import NPointCrossover
 
 
-class OnePointCrossOver(NPointCrossover):
+class OnePointCrossover(NPointCrossover):
 
     def __init__(self, population_count, crossover_param, elite_count=0):
         super().__init__(population_count, elite_count)

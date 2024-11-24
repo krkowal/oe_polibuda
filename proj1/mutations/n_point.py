@@ -5,6 +5,8 @@ from proj1.mutations.mutation import Mutation
 
 
 class NPointMutation(Mutation, ABC):
+    def __init__(self, mutation_param):
+        super().__init__(mutation_param)
 
     def n_point_mutation(self, gene, n, position_set=None) -> str:
         binary_list = list(gene)
