@@ -12,9 +12,7 @@ def calculate_gens_length(gen_range, accuracy):
 
 class BinaryChromosome(Chromosome):
     def __init__(self, gens_count, min_range, max_range, gens_length=None, gens=None):
-        super().__init__()
-        self._min_range = min_range
-        self._max_range = max_range
+        super().__init__(min_range, max_range)
         self._gen_range = max_range - min_range
         self._gens_count = gens_count
         self._gens_length = calculate_gens_length(self._gen_range, ACCURACY) if gens is None else gens_length

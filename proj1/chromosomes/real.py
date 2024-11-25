@@ -1,12 +1,13 @@
+from typing import List
+
 from proj1.chromosomes.chromosome import Chromosome
 import random
 
 
 class RealChromosome(Chromosome):
+
     def __init__(self, gens_count, min_range, max_range, genes=None):
-        super().__init__()
-        self._min_range = min_range
-        self._max_range = max_range
+        super().__init__(min_range, max_range)
         self._gen_range = max_range - min_range
         self._gens_count = gens_count
 
@@ -16,7 +17,7 @@ class RealChromosome(Chromosome):
         return func(self._gens_list)
 
     def __get_random_genes(self):
-        return [random.randrange(self._min_range, self._max_range) for _ in range(self._gens_count)]
+        return [random.uniform(self._min_range, self._max_range) for _ in range(self._gens_count)]
 
     @classmethod
     def from_crossover_and_mutations(cls, parent_chromosome: 'RealChromosome', genes):
@@ -24,3 +25,6 @@ class RealChromosome(Chromosome):
 
     def get_init_params(self):
         return [self._gens_count, self._min_range, self._max_range]
+
+    def get_genes_list(self) -> List[int]:
+        return self._gens_list

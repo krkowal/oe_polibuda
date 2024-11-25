@@ -1,10 +1,10 @@
 import random
 from abc import ABC
 
-from proj1.mutations.mutation import Mutation
+from proj1.mutations.binary_mutation import BinaryMutation
 
 
-class NPointMutation(Mutation, ABC):
+class NPointMutation(BinaryMutation, ABC):
     def __init__(self, mutation_param):
         super().__init__(mutation_param)
 

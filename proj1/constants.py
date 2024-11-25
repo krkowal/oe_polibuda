@@ -22,3 +22,5 @@ WEIERSTRASS_FUNCTION = "shifted_and_rotated_weierstrass_function"
 
 REAL = "real"
 BINARY = "binary"
+
+GAUSS = "gauss"
