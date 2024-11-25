@@ -1,6 +1,6 @@
 import numpy as np
 
-from constants import VALUE_FUNC_DIR
+from constants import VALUE_FUNC_DIR, BINARY
 from proj1.Inversion import Inversion
 from proj1.chromosomes.chromosome import Chromosome
 from proj1.chromosomes.chromosome_list_factory import ChromosomeListFactory
@@ -28,6 +28,7 @@ class Population:
         self._gens_count = genes_count
         self._min_range = min_range
         self._max_range = max_range
+        self._selection_name = selection_name
         # self._selection = Selection(selection_name, selection_param, has_elitism=has_elitism,
         #                             elitism_count=elitism_count, is_maximization=is_maximization)
         self._selection = SelectionFactory.get_selection(selection_name, selection_param, has_elitism=has_elitism,
@@ -67,7 +68,8 @@ class Population:
             crossed_chromosome_list = crossed_chromosome_list[:self._population_count - self._elitism_count]
             mutated_chromosomes_list = self._mutation.mutate(crossed_chromosome_list)
 
-            inverted_chromosomes = self._inversion.invert(mutated_chromosomes_list)
+            inverted_chromosomes = self._inversion.invert(
+                mutated_chromosomes_list) if self._selection_name == BINARY else mutated_chromosomes_list
 
             elite_chromosomes_list.extend(inverted_chromosomes)
             self._chromosomes_list = elite_chromosomes_list
@@ -86,3 +88,32 @@ class Population:
             # print(f"Mean value in this epoch: {sum(values) / len(values)}")
 
         return all_values, best_values, final_value
+
+    def test_iteration(self):
+        print("start")
+
+        for chromosome, value in self.evaluate_chromosomes():
+            print(chromosome.get_genes_list(), value)
+        selected_chromosomes_list = self._selection.select(self.evaluate_chromosomes())
+        elite_chromosomes_list = []
+        if self._has_elitism:
+            elite_chromosomes_list = [chromosome for chromosome, value in
+                                      selected_chromosomes_list[:self._elitism_count]]
+            selected_chromosomes_list = selected_chromosomes_list[self._elitism_count:]
+        print("select")
+
+        for chromosome, value in selected_chromosomes_list:
+            print(chromosome.get_genes_list(), value)
+
+        # print("mutate")
+        # crossed_chromosome_list = self._crossover.cross(selected_chromosomes_list)
+        # crossed_chromosome_list = crossed_chromosome_list[:self._population_count - self._elitism_count]
+
+        # for chromosome, value in selected_chromosomes_list:
+        #     print(chromosome.get_genes_list(), value)
+        print("mutate")
+
+        mutated_chromosomes_list = self._mutation.mutate([chromosome for chromosome, value in
+                                                          selected_chromosomes_list])
+        for chromosome in mutated_chromosomes_list:
+            print(chromosome.get_genes_list())
