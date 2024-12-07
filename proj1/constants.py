@@ -24,3 +24,10 @@ REAL = "real"
 BINARY = "binary"
 
 GAUSS = "gauss"
+
+
+ARITHMETIC = "arithmetic"
+LINEAR = "linear"
+ALPHA = "alpha"
+ALPHABETA = "alphabeta"
+AVERAGING = "averaging"
