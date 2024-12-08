@@ -14,7 +14,7 @@ from proj1.crossovers.averaging import AveragingCrossover
 
 class CrossoverFactory:
     @staticmethod
-    def get_crossover(name, population_count, crossover_param, elite_count) -> Crossover:
+    def get_crossover(name, population_count, crossover_param, crossover_param2, elite_count) -> Crossover:
         match name:
             case constants.ONE_POINT:
                 return OnePointCrossover(population_count, crossover_param, elite_count)
@@ -31,7 +31,7 @@ class CrossoverFactory:
             case constants.ALPHA:
                 return AlphaMixingCrossover(population_count, crossover_param, elite_count)
             case constants.ALPHABETA:
-                return AlphaBetaMixingCrossover(population_count, crossover_param, elite_count)
+                return AlphaBetaMixingCrossover(population_count, crossover_param, crossover_param2, elite_count)
             case constants.AVERAGING:
                 return AveragingCrossover(population_count, crossover_param, elite_count)
             case _:

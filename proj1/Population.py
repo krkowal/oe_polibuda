@@ -15,7 +15,7 @@ class Population:
                  max_range: float,
                  selection_name: str,
                  selection_param: int,
-                 crossover_name: str, crossover_param: float, mutation_name: str, mutation_param: float,
+                 crossover_name: str, crossover_param: float, crossover_param2: float, mutation_name: str, mutation_param: float,
                  inversion_param: float, genes_count: int,
                  has_elitism: bool = False,
                  elitism_count: int = 0,
@@ -34,7 +34,7 @@ class Population:
         self._selection = SelectionFactory.get_selection(selection_name, selection_param, has_elitism=has_elitism,
                                                          elitism_count=elitism_count,
                                                          is_maximization=is_maximization)
-        self._crossover = CrossoverFactory.get_crossover(crossover_name, population_count, crossover_param,
+        self._crossover = CrossoverFactory.get_crossover(crossover_name, population_count, crossover_param, crossover_param2,
                                                          elite_count=elitism_count)
         self._mutation = MutationFactory.get_mutation(mutation_name, mutation_param)
         self._inversion = Inversion(inversion_param)

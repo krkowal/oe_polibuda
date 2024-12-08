@@ -3,13 +3,13 @@ from proj1 import constants
 from Plotter import Plotter
 
 if __name__ == '__main__':
-    pop = Population("binary", population_count=8, max_range=5, min_range=-5,
+    pop = Population("real", population_count=8, max_range=5, min_range=-5,
                      value_func_name=constants.STYBLISNKI_TANG_FUNCTION,
                      selection_name=constants.BEST,
-                     selection_param=4, is_maximization=False, crossover_name=constants.ONE_POINT, crossover_param=0.5,
-                     mutation_name=constants.TWO_POINT, mutation_param=0.1,  # Adjusted mutation parameter
+                     selection_param=4, is_maximization=False, crossover_name=constants.ALPHA, crossover_param=0.5,
+                     crossover_param2=0.1, mutation_name=constants.UNIFORM, mutation_param=0.1,  # Adjusted mutation parameter
                      inversion_param=1, has_elitism=True,
-                     elitism_count=2, epochs=100, genes_count=2)
+                     elitism_count=2, epochs=10, genes_count=2)
 
     all_values, best_values, final_value = pop.population_loop()
     print("Final Value:", final_value)
@@ -19,3 +19,14 @@ if __name__ == '__main__':
     plotter.save_all_values(all_values)
     plotter.save_mean_and_std(all_values)
     plotter.save_best_value_and_std(best_values, all_values)
+
+
+    """
+    pop = Population("binary", population_count=8, max_range=5, min_range=-5,
+                     value_func_name=constants.STYBLISNKI_TANG_FUNCTION,
+                     selection_name=constants.BEST,
+                     selection_param=4, is_maximization=False, crossover_name=constants.ONE_POINT, crossover_param=0.5,
+                     crossover_param2=0.1, mutation_name=constants.TWO_POINT, mutation_param=0.1,  # Adjusted mutation parameter
+                     inversion_param=1, has_elitism=True,
+                     elitism_count=2, epochs=100, genes_count=2)
+    """

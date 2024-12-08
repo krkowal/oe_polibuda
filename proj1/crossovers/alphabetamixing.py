@@ -4,10 +4,10 @@ from proj1.crossovers.real_crossover import RealCrossover
 
 
 class AlphaBetaMixingCrossover(RealCrossover):
-    def __init__(self, population_count, crossover_param, elite_count=0):
+    def __init__(self, population_count, crossover_param,crossover_param2, elite_count=0):
         super().__init__(population_count, elite_count)
         self._alpha = crossover_param
-        self._beta = 0.3 #Na razie ręcznie!!!
+        self._beta = crossover_param2
 
     def _crossover_function(self, chromosome_list: list[RealChromosome]) -> list[RealChromosome]:
         parent1, parent2 = chromosome_list
