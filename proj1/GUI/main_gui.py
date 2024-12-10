@@ -52,12 +52,24 @@ class App(tk.Tk):
 
         self.textbox_labels = [
             'Population amount', 'Begin of the range - a', 'End of the range - b',
-            'Selection parameter', 'Crossover probability', 'Mutation probability',
+            'Selection parameter', 'Crossover probability', 'Crossover probability Beta', 'Mutation probability',
             'Inversion probability', 'Elite Strategy amount', 'Epochs amount', 'Genes count'
         ]
         self.create_widgets()
 
     def create_widgets(self):
+
+        self.chromosome_type_var = tk.StringVar(value=constants.REAL)
+
+        chromosome_label = tk.Label(self, text="Choose type of chromosome", font=("Arial", 10))
+        chromosome_label.pack(pady=5)
+
+        real_radio = tk.Radiobutton(self, text="Real", variable=self.chromosome_type_var, value=constants.REAL)
+        real_radio.pack(pady=2)
+
+        binary_radio = tk.Radiobutton(self, text="Binary", variable=self.chromosome_type_var, value=constants.BINARY)
+        binary_radio.pack(pady=2)
+
         self.textboxes = []
         for label_text in self.textbox_labels:
             frame = tk.Frame(self)
@@ -79,10 +91,13 @@ class App(tk.Tk):
 
         self.combobox_values = [
             [constants.BEST, constants.ROULETTE, constants.TOURNAMENT],
-            [constants.ONE_POINT, constants.TWO_POINT, constants.UNIFORM, constants.DISCRETE],
-            [constants.ONE_POINT, constants.TWO_POINT],
+            [constants.ONE_POINT, constants.TWO_POINT, constants.UNIFORM, constants.DISCRETE,
+             constants.ARITHMETIC,constants.LINEAR,constants.ALPHA,constants.ALPHABETA,constants.AVERAGING],
+            [constants.ONE_POINT, constants.TWO_POINT,constants.BOUNDARY,constants.GAUSS,constants.UNIFORM],
             list(constants.VALUE_FUNC_DIR.keys())
         ]
+
+
 
         default_values = [constants.BEST, constants.ONE_POINT, constants.ONE_POINT, constants.STYBLISNKI_TANG_FUNCTION]
 
@@ -149,6 +164,7 @@ class App(tk.Tk):
         combobox_values = [combobox.get() for combobox in self.comboboxes]
         checkbox_value = self.checkbox_var.get()
         checkbox_value2 = self.checkbox_var2.get()
+        real_radio_value = self.chromosome_type_var.get()
 
 
         selection_method = combobox_values[0]
@@ -157,6 +173,7 @@ class App(tk.Tk):
         selected_function_key = combobox_values[3]
 
         pop = Population(
+            chromosome_type=real_radio_value,
             population_count=int(textbox_values[0]),
             max_range=int(textbox_values[2]),
             min_range=int(textbox_values[1]),
@@ -166,6 +183,7 @@ class App(tk.Tk):
             is_maximization=checkbox_value,
             crossover_name=crossover_method,
             crossover_param=float(textbox_values[4]),
+            crossover_param2=0.1,
             mutation_name=mutation_method,
             mutation_param=float(textbox_values[5]),
             inversion_param=float(textbox_values[6]),
