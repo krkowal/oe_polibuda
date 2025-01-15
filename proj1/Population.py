@@ -1,11 +1,15 @@
+import benchmark_functions
 import numpy as np
+import pygad
 
 from constants import VALUE_FUNC_DIR, BINARY
 from proj1.Inversion import Inversion
 from proj1.chromosomes.chromosome import Chromosome
 from proj1.chromosomes.chromosome_list_factory import ChromosomeListFactory
 from proj1.crossovers.crossover_factory import CrossoverFactory
+from proj1.crossovers.pygad_crossovers_factory import PygadCrossoverFactory
 from proj1.mutations.mutation_factory import MutationFactory
+from proj1.selections.pygad_selections_factory import PygadSelectionFactory
 from proj1.selections.selection_factory import SelectionFactory
 
 
@@ -117,3 +121,65 @@ class Population:
                                                           selected_chromosomes_list])
         for chromosome in mutated_chromosomes_list:
             print(chromosome.get_genes_list())
+
+    def pygad_iteration(self):
+
+        is_minimum = True
+        func = benchmark_functions.StyblinskiTang(n_dimensions=5)
+        minimum = func.minimum().score
+        is_minimum = True
+
+        # print(minimum)
+
+        def fitness_func(ga_instance, solution, solution_idx):
+            # func.
+            # print(solution)
+            value = func(solution)
+            # print(minimum)
+            shifted_value = value + abs(minimum) + 1e-6
+            # print(shifted_value)
+            if is_minimum:
+                return shifted_value
+            return 1 / shifted_value
+
+        def f(ga_instance, solution, solution_idx):
+            return 1 / func(solution)
+
+        num_generations = 100
+        sol_per_pop = 80
+        num_parents_mating = 50
+        # boundary = func.suggested_bounds() #możemy wziąć stąd zakresy
+        init_range_low = -32.768
+        init_range_high = 32.768
+        mutation_num_genes = 1
+        parent_selection_type = "tournament"
+        crossover_type = PygadCrossoverFactory.get_crossover("discrete")
+        mutation_type = "random"
+
+        selection = PygadSelectionFactory.get_selection("best")
+
+        ga_instance = pygad.GA(num_generations=10,
+                               sol_per_pop=10,
+                               num_parents_mating=10,
+                               fitness_func=fitness_func,
+                               # gene_type=float,
+                               num_genes=5,
+                               parent_selection_type=selection,
+                               mutation_num_genes=1,
+                               init_range_low=-5,
+                               init_range_high=5,
+                               crossover_type=crossover_type,
+                               # keep_elitism=1,
+                               K_tournament=3,
+                               parallel_processing=['thread', 4]
+                               )
+
+        ga_instance.run()
+
+        best = ga_instance.best_solution()
+        solution, solution_fitness, solution_idx = ga_instance.best_solution()
+
+        print("Parameters of the best solution : {solution}".format(solution=solution))
+        print(best)
+        print(max(list(map(lambda x: func(x), ga_instance.population))))
+        print(min(list(map(lambda x: func(x), ga_instance.population))))
