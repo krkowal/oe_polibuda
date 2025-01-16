@@ -70,6 +70,44 @@ def linear_crossover(parents, offspring_size, ga_instance):
 
     return np.array(offspring)
 
+
+def alpha_mixing_crossover(parents, offspring_size, ga_instance):
+    offspring = []
+    alpha = ga_instance.crossover_probability
+
+    idx = 0
+    while len(offspring) < offspring_size[0]:
+        parent1 = parents[idx % parents.shape[0], :].copy()
+        parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
+
+        child = alpha * parent1 + (1 - alpha) * parent2
+        offspring.append(child)
+
+        idx += 1
+
+    return np.array(offspring)
+
+def alpha_beta_mixing_crossover(parents, offspring_size, ga_instance):
+    offspring = []
+    idx = 0
+    alpha = ga_instance.crossover_probability
+    beta = 0.1
+
+    while len(offspring) < offspring_size[0]:
+        parent1 = parents[idx % parents.shape[0], :].copy()
+        parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
+
+        child1_genes = alpha * parent1 + (1 - alpha) * parent2
+        child2_genes = beta * parent1 + (1 - beta) * parent2
+
+        offspring.append(child1_genes)
+        if len(offspring) < offspring_size[0]:
+            offspring.append(child2_genes)
+
+        idx += 1
+
+    return np.array(offspring)
+
 class PygadCrossoverFactory:
     @staticmethod
     def get_crossover(name):
