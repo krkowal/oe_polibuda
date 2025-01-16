@@ -8,25 +8,29 @@ def one_point_mutation(offspring, ga_instance):
     pass
 
 def uniform_mutation(offspring, ga_instance):
+    init_range_low = ga_instance.init_range_low
+    init_range_high = ga_instance.init_range_high
+
     for chromosome_idx in range(offspring.shape[0]):
         genotype = offspring[chromosome_idx]
         position = np.random.choice(range(genotype.shape[0]))
-        min_range, max_range = ga_instance.gene_space[position]
-        genotype[position] = np.random.uniform(min_range, max_range)
+        genotype[position] = np.random.uniform(init_range_low, init_range_high)
 
     return offspring
 
 def gaussian_mutation(offspring, ga_instance):
+    init_range_low = ga_instance.init_range_low
+    init_range_high = ga_instance.init_range_high
+
     for chromosome_idx in range(offspring.shape[0]):
         genotype = offspring[chromosome_idx]
         new_genes = []
-        min_range, max_range = ga_instance.gene_space[0]
 
         for gene in genotype:
             max_attempts = 1000
             for _ in range(max_attempts):
                 normal_rand_value = np.random.normal(0, 1)
-                if min_range <= gene + normal_rand_value <= max_range:
+                if init_range_low <= gene + normal_rand_value <= init_range_high:
                     new_genes.append(gene + normal_rand_value)
                     break
             else:
