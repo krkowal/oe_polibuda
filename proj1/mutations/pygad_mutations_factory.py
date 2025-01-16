@@ -8,21 +8,32 @@ def one_point_mutation(offspring, ga_instance):
     pass
 
 def uniform_mutation(offspring, ga_instance):
-    for child in offspring:
-        position = np.random.randint(0, len(child))
-        child[position] = np.random.uniform(ga_instance.gene_space[position][0],
-                                             ga_instance.gene_space[position][1])
+    for chromosome_idx in range(offspring.shape[0]):
+        genotype = offspring[chromosome_idx]
+        position = np.random.choice(range(genotype.shape[0]))
+        min_range, max_range = ga_instance.gene_space[position]
+        genotype[position] = np.random.uniform(min_range, max_range)
+
     return offspring
 
 def gaussian_mutation(offspring, ga_instance):
-    for child in offspring:
-        for idx in range(len(child)):
-            while True:
+    for chromosome_idx in range(offspring.shape[0]):
+        genotype = offspring[chromosome_idx]
+        new_genes = []
+        min_range, max_range = ga_instance.gene_space[0]
+
+        for gene in genotype:
+            max_attempts = 1000
+            for _ in range(max_attempts):
                 normal_rand_value = np.random.normal(0, 1)
-                new_gene_value = child[idx] + normal_rand_value
-                if ga_instance.gene_space[idx][0] <= new_gene_value <= ga_instance.gene_space[idx][1]:
-                    child[idx] = new_gene_value
+                if min_range <= gene + normal_rand_value <= max_range:
+                    new_genes.append(gene + normal_rand_value)
                     break
+            else:
+                new_genes.append(gene)
+
+        offspring[chromosome_idx] = new_genes
+
     return offspring
 
 class PygadMutationFactory:
