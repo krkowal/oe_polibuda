@@ -51,6 +51,24 @@ def averaging_crossover(parents, offspring_size, ga_instance):
 
     return np.array(offspring)
 
+def linear_crossover(parents, offspring_size, ga_instance):
+    offspring = []
+    idx = 0
+    while len(offspring) < offspring_size[0]:
+        parent1 = parents[idx % parents.shape[0], :].copy()
+        parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
+
+        child1 = (parent1 + parent2) / 2
+        child2 = 1.5 * parent1 - 0.5 * parent2
+        child3 = -0.5 * parent1 + 1.5 * parent2
+
+        offspring.extend([child1, child2, child3])
+        if len(offspring) > offspring_size[0]:
+            offspring = offspring[:offspring_size[0]]
+
+        idx += 1
+
+    return np.array(offspring)
 
 class PygadCrossoverFactory:
     @staticmethod
@@ -68,5 +86,7 @@ class PygadCrossoverFactory:
                 return arithmetic_crossover
             case constants.AVERAGING:
                 return averaging_crossover
+            case constants.LINEAR:
+                return linear_crossover
             case _:
                 raise ValueError(f"Unknown selection method: {name}")
