@@ -22,6 +22,35 @@ def discrete_crossover(parents, offspring_size, ga_instance):
 
     return offspring
 
+def arithmetic_crossover(parents, offspring_size, ga_instance):
+    offspring = []
+    idx = 0
+    while len(offspring) < offspring_size[0]:
+        parent1 = parents[idx % parents.shape[0], :].copy()
+        parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
+
+        alpha = np.random.uniform(0, 1)
+        child = alpha * parent1 + (1 - alpha) * parent2
+
+        offspring.append(child)
+        idx += 1
+
+    return np.array(offspring)
+
+def averaging_crossover(parents, offspring_size, ga_instance):
+    offspring = []
+    idx = 0
+    while len(offspring) < offspring_size[0]:
+        parent1 = parents[idx % parents.shape[0], :].copy()
+        parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
+
+        child = (parent1 + parent2) / 2
+
+        offspring.append(child)
+        idx += 1
+
+    return np.array(offspring)
+
 
 class PygadCrossoverFactory:
     @staticmethod
@@ -35,5 +64,9 @@ class PygadCrossoverFactory:
                 return "uniform"
             case constants.DISCRETE:
                 return discrete_crossover
+            case constants.ARITHMETIC:
+                return arithmetic_crossover
+            case constants.AVERAGING:
+                return averaging_crossover
             case _:
                 raise ValueError(f"Unknown selection method: {name}")
