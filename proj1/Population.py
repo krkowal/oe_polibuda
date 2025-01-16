@@ -9,6 +9,7 @@ from proj1.chromosomes.chromosome_list_factory import ChromosomeListFactory
 from proj1.crossovers.crossover_factory import CrossoverFactory
 from proj1.crossovers.pygad_crossovers_factory import PygadCrossoverFactory
 from proj1.mutations.mutation_factory import MutationFactory
+from proj1.mutations.pygad_mutations_factory import PygadMutationFactory
 from proj1.selections.pygad_selections_factory import PygadSelectionFactory
 from proj1.selections.selection_factory import SelectionFactory
 
@@ -169,6 +170,7 @@ class Population:
                                init_range_low=-5,
                                init_range_high=5,
                                crossover_type=crossover_type,
+                               crossover_probability=0.1,
                                # keep_elitism=1,
                                K_tournament=3,
                                parallel_processing=['thread', 4]
