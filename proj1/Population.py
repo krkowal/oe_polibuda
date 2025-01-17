@@ -3,9 +3,11 @@ from math import ceil, log2
 
 import benchmark_functions
 import numpy as np
+import opfunu
 import pygad
 
 from constants import VALUE_FUNC_DIR, BINARY
+from proj1 import constants
 from proj1.Inversion import Inversion
 from proj1.chromosomes.chromosome import Chromosome
 from proj1.chromosomes.chromosome_list_factory import ChromosomeListFactory
@@ -28,6 +30,11 @@ class Population:
                  has_elitism: bool = False,
                  elitism_count: int = 0,
                  is_maximization: bool = False):
+        self._gen_range = max_range - min_range
+        self._crossover_name = crossover_name
+        self._mutation_name = mutation_name
+        self._selection_param = selection_param
+        self._chromosome_type = chromosome_type
         self._is_maximization = is_maximization
         self._epochs = epochs
         self._population_count = population_count
@@ -131,29 +138,35 @@ class Population:
         def calculate_gens_length(gen_range, accuracy):
             return ceil(log2(gen_range * 10 ** accuracy) + log2(1))
 
-        is_minimum = True
-        func = benchmark_functions.StyblinskiTang(n_dimensions=5)
+        is_binary = self._chromosome_type == "binary"
+
+        gene_type = int if is_binary else float
+        gene_space = [0, 1] if is_binary else None
+
+        is_minimum = not self._is_maximization
+
+        func = benchmark_functions.StyblinskiTang(
+            n_dimensions=self._gens_count) if self._value_func_name == constants.STYBLISNKI_TANG_FUNCTION else \
+            opfunu.get_functions_by_classname("F62014")[0](ndim=self._gens_count).evaluate
+
         minimum = func.minimum().score
         is_minimum = True
-        gens_length = calculate_gens_length(10, 6)
+        gens_length = calculate_gens_length(self._max_range - self._min_range, constants.ACCURACY)
 
-        def get_variables_values() -> list[float]:
-            return list(map(lambda gen: -5 + int(gen, 2) * 10 / (2 ** gens_length - 1),
-                            self._gens_list))
+        num_genes = self._gens_count * gens_length
 
-        # print(minimum)
         def decode_gene(genes_list):
-            genes_length = len(genes_list) / 5
+            genes_length = len(genes_list) / self._gens_count
             # print(genes_list)
-            func = lambda gen: -5 + int(gen, 2) * 10 / (2 ** genes_length - 1)
+            func = lambda gen: self._min_range + int(gen, 2) * self._gen_range / (2 ** genes_length - 1)
             results = []
             # for gene in genes_list:
             binary_string = ''.join(map(str, genes_list))
-            substring_length = len(binary_string) // 5
+            substring_length = len(binary_string) // self._gens_count
             substrings = [binary_string[i:i + substring_length] for i in
                           range(0, len(binary_string), substring_length)]
             results = [func(substring) for substring in substrings]
-            print(results)
+            # print(results)
             # result = func(substrings)
             # results.append(result)
 
@@ -161,20 +174,15 @@ class Population:
             return results
 
         def fitness_func(ga_instance, solution, solution_idx):
-            print(solution)
-            solution = decode_gene(solution)
-            print(solution)
+            solution = decode_gene(solution) if is_binary else solution
             value = func(solution)
-            print(value)
-            # print(minimum)
             shifted_value = value + abs(minimum) + 1e-6
-            # print(shifted_value)
-            if is_minimum:
+            if is_minimum and not self._selection_name == "roulette":
                 return shifted_value
             return 1 / shifted_value
 
-        def f(ga_instance, solution, solution_idx):
-            return 1 / func(solution)
+        # def f(ga_instance, solution, solution_idx):
+        #     return 1 / func(solution)
 
         num_generations = 100
         sol_per_pop = 80
@@ -184,36 +192,41 @@ class Population:
         init_range_high = 32.768
         mutation_num_genes = 1
         parent_selection_type = "tournament"
-        crossover_type = PygadCrossoverFactory.get_crossover("two-point")
-        mutation_type = "random"
-
-        selection = PygadSelectionFactory.get_selection("best")
+        crossover = PygadCrossoverFactory.get_crossover(self._crossover_name)
+        selection = PygadSelectionFactory.get_selection(self._selection_name)
+        mutation = PygadMutationFactory.get_mutation(self._mutation_name)
 
         start = time.perf_counter()
-        ga_instance = pygad.GA(num_generations=100,
-                               sol_per_pop=32,
-                               num_parents_mating=8,
+        ga_instance = pygad.GA(num_generations=self._epochs,
+                               sol_per_pop=self._population_count,
+                               num_parents_mating=self._selection_param,
                                fitness_func=fitness_func,
-                               gene_type=int,
-                               num_genes=5 * gens_length,
+                               gene_type=gene_type,
+                               num_genes=num_genes,
                                parent_selection_type=selection,
                                mutation_num_genes=1,
-                               init_range_low=-5,
-                               init_range_high=5,
-                               crossover_type=crossover_type,
+                               init_range_low=self._min_range,
+                               init_range_high=self._max_range,
+                               crossover_type=crossover,
                                crossover_probability=0.1,
+                               mutation_type=mutation,
+                               mutation_probability=0.2,
                                # keep_elitism=1,
                                K_tournament=3,
                                parallel_processing=['thread', 0],
-                               gene_space=[0, 1]
+                               gene_space=gene_space
                                )
 
         ga_instance.run()
         print(time.perf_counter() - start)
         # best = ga_instance.best_solution()
         # solution, solution_fitness, solution_idx = ga_instance.best_solution()
-        #
+
         # print("Parameters of the best solution : {solution}".format(solution=solution))
         # print(best)
-        # print(max(list(map(lambda x: func(x), ga_instance.population))))
-        # print(min(list(map(lambda x: func(x), ga_instance.population))))
+        if is_binary:
+            print(max(list(map(lambda x: func(decode_gene(x)), ga_instance.population))))
+            print(min(list(map(lambda x: func(decode_gene(x)), ga_instance.population))))
+        else:
+            print(max(list(map(lambda x: func(x), ga_instance.population))))
+            print(min(list(map(lambda x: func(x), ga_instance.population))))
