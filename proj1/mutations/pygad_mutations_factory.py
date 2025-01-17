@@ -40,6 +40,10 @@ def gaussian_mutation(offspring, ga_instance):
 
     return offspring
 
+
+
+def one_point_mutation()
+
 class PygadMutationFactory:
     @staticmethod
     def get_mutation(name):

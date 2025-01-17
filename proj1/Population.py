@@ -1,3 +1,6 @@
+import time
+from math import ceil, log2
+
 import benchmark_functions
 import numpy as np
 import pygad
@@ -125,17 +128,44 @@ class Population:
 
     def pygad_iteration(self):
 
+        def calculate_gens_length(gen_range, accuracy):
+            return ceil(log2(gen_range * 10 ** accuracy) + log2(1))
+
         is_minimum = True
         func = benchmark_functions.StyblinskiTang(n_dimensions=5)
         minimum = func.minimum().score
         is_minimum = True
+        gens_length = calculate_gens_length(10, 6)
+
+        def get_variables_values() -> list[float]:
+            return list(map(lambda gen: -5 + int(gen, 2) * 10 / (2 ** gens_length - 1),
+                            self._gens_list))
 
         # print(minimum)
+        def decode_gene(genes_list):
+            genes_length = len(genes_list) / 5
+            # print(genes_list)
+            func = lambda gen: -5 + int(gen, 2) * 10 / (2 ** genes_length - 1)
+            results = []
+            # for gene in genes_list:
+            binary_string = ''.join(map(str, genes_list))
+            substring_length = len(binary_string) // 5
+            substrings = [binary_string[i:i + substring_length] for i in
+                          range(0, len(binary_string), substring_length)]
+            results = [func(substring) for substring in substrings]
+            print(results)
+            # result = func(substrings)
+            # results.append(result)
+
+            results = np.array(results)
+            return results
 
         def fitness_func(ga_instance, solution, solution_idx):
-            # func.
-            # print(solution)
+            print(solution)
+            solution = decode_gene(solution)
+            print(solution)
             value = func(solution)
+            print(value)
             # print(minimum)
             shifted_value = value + abs(minimum) + 1e-6
             # print(shifted_value)
@@ -154,17 +184,18 @@ class Population:
         init_range_high = 32.768
         mutation_num_genes = 1
         parent_selection_type = "tournament"
-        crossover_type = PygadCrossoverFactory.get_crossover("discrete")
+        crossover_type = PygadCrossoverFactory.get_crossover("two-point")
         mutation_type = "random"
 
         selection = PygadSelectionFactory.get_selection("best")
 
-        ga_instance = pygad.GA(num_generations=10,
-                               sol_per_pop=10,
-                               num_parents_mating=10,
+        start = time.perf_counter()
+        ga_instance = pygad.GA(num_generations=100,
+                               sol_per_pop=32,
+                               num_parents_mating=8,
                                fitness_func=fitness_func,
-                               # gene_type=float,
-                               num_genes=5,
+                               gene_type=int,
+                               num_genes=5 * gens_length,
                                parent_selection_type=selection,
                                mutation_num_genes=1,
                                init_range_low=-5,
@@ -173,15 +204,16 @@ class Population:
                                crossover_probability=0.1,
                                # keep_elitism=1,
                                K_tournament=3,
-                               parallel_processing=['thread', 4]
+                               parallel_processing=['thread', 0],
+                               gene_space=[0, 1]
                                )
 
         ga_instance.run()
-
-        best = ga_instance.best_solution()
-        solution, solution_fitness, solution_idx = ga_instance.best_solution()
-
-        print("Parameters of the best solution : {solution}".format(solution=solution))
-        print(best)
-        print(max(list(map(lambda x: func(x), ga_instance.population))))
-        print(min(list(map(lambda x: func(x), ga_instance.population))))
+        print(time.perf_counter() - start)
+        # best = ga_instance.best_solution()
+        # solution, solution_fitness, solution_idx = ga_instance.best_solution()
+        #
+        # print("Parameters of the best solution : {solution}".format(solution=solution))
+        # print(best)
+        # print(max(list(map(lambda x: func(x), ga_instance.population))))
+        # print(min(list(map(lambda x: func(x), ga_instance.population))))
