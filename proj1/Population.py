@@ -147,13 +147,17 @@ class Population:
 
         func = benchmark_functions.StyblinskiTang(
             n_dimensions=self._gens_count) if self._value_func_name == constants.STYBLISNKI_TANG_FUNCTION else \
-            opfunu.get_functions_by_classname("F62014")[0](ndim=self._gens_count).evaluate
+            opfunu.get_functions_by_classname("F62014")[0](ndim=self._gens_count)
 
-        minimum = func.minimum().score
+        if self._value_func_name == constants.WEIERSTRASS_FUNCTION:
+            func.dim_supported = list(range(2, 101))
+            func = func.evaluate
+
+        minimum = func.minimum().score if self._value_func_name == constants.STYBLISNKI_TANG_FUNCTION else 600
         is_minimum = True
         gens_length = calculate_gens_length(self._max_range - self._min_range, constants.ACCURACY)
 
-        num_genes = self._gens_count * gens_length
+        num_genes = self._gens_count * gens_length if is_binary else self._gens_count
 
         def decode_gene(genes_list):
             genes_length = len(genes_list) / self._gens_count
