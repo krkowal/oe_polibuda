@@ -10,7 +10,7 @@ def discrete_crossover(parents, offspring_size, ga_instance):
 
     offspring = np.empty(offspring_size)
 
-    for offspring_idx in range(ga_instance.sol_per_pop):
+    for offspring_idx in range(num_offspring):
         parent1_idx = np.random.randint(0, num_parents)
         parent2_idx = np.random.randint(0, num_parents)
 
@@ -21,6 +21,7 @@ def discrete_crossover(parents, offspring_size, ga_instance):
                 offspring[offspring_idx, gene_idx] = parents[parent2_idx, gene_idx]
 
     return offspring
+
 
 def arithmetic_crossover(parents, offspring_size, ga_instance):
     offspring = []
@@ -37,6 +38,7 @@ def arithmetic_crossover(parents, offspring_size, ga_instance):
 
     return np.array(offspring)
 
+
 def averaging_crossover(parents, offspring_size, ga_instance):
     offspring = []
     idx = 0
@@ -50,6 +52,7 @@ def averaging_crossover(parents, offspring_size, ga_instance):
         idx += 1
 
     return np.array(offspring)
+
 
 def linear_crossover(parents, offspring_size, ga_instance):
     offspring = []
@@ -87,6 +90,7 @@ def alpha_mixing_crossover(parents, offspring_size, ga_instance):
 
     return np.array(offspring)
 
+
 def alpha_beta_mixing_crossover(parents, offspring_size, ga_instance):
     offspring = []
     idx = 0
@@ -107,6 +111,7 @@ def alpha_beta_mixing_crossover(parents, offspring_size, ga_instance):
         idx += 1
 
     return np.array(offspring)
+
 
 class PygadCrossoverFactory:
     @staticmethod

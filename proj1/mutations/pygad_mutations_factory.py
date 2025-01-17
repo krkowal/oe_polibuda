@@ -5,7 +5,35 @@ from proj1 import constants
 
 
 def one_point_mutation(offspring, ga_instance):
-    pass
+    for offspring_idx in range(offspring.shape[0]):
+        if np.random.rand() > ga_instance.mutation_probability:
+            continue
+        mutation_point = np.random.randint(0, offspring.shape[1])
+        offspring[offspring_idx, mutation_point] = 1 - offspring[offspring_idx, mutation_point]
+
+    return offspring
+
+
+def two_point_mutation(offspring, ga_instance):
+    for offspring_idx in range(offspring.shape[0]):
+        if np.random.rand() > ga_instance.mutation_probability:
+            continue
+        for i in range(2):
+            mutation_point = np.random.randint(0, offspring.shape[1])
+            offspring[offspring_idx, mutation_point] = 1 - offspring[offspring_idx, mutation_point]
+
+    return offspring
+
+
+def boundary_mutation(offspring, ga_instance):
+    for offspring_idx in range(offspring.shape[0]):
+        if np.random.rand() > ga_instance.mutation_probability:
+            continue
+        mutation_point = np.random.randint(0, 1) * offspring.shape[1]
+        offspring[offspring_idx, mutation_point] = 1 - offspring[offspring_idx, mutation_point]
+
+    return offspring
+
 
 def uniform_mutation(offspring, ga_instance):
     init_range_low = ga_instance.init_range_low
@@ -17,6 +45,7 @@ def uniform_mutation(offspring, ga_instance):
         genotype[position] = np.random.uniform(init_range_low, init_range_high)
 
     return offspring
+
 
 def gaussian_mutation(offspring, ga_instance):
     init_range_low = ga_instance.init_range_low
@@ -40,16 +69,17 @@ def gaussian_mutation(offspring, ga_instance):
 
     return offspring
 
+
 class PygadMutationFactory:
     @staticmethod
     def get_mutation(name):
         match name:
             case constants.ONE_POINT:
-                return OnePointMutation(mutation_param)
+                return one_point_mutation
             case constants.TWO_POINT:
-                return TwoPointMutation(mutation_param)
+                return two_point_mutation
             case constants.BOUNDARY:
-                return BoundaryMutation(mutation_param)
+                return boundary_mutation
             case constants.UNIFORM:
                 return uniform_mutation
             case constants.GAUSS:
