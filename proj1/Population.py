@@ -161,18 +161,12 @@ class Population:
 
         def decode_gene(genes_list):
             genes_length = len(genes_list) / self._gens_count
-            # print(genes_list)
             func = lambda gen: self._min_range + int(gen, 2) * self._gen_range / (2 ** genes_length - 1)
-            results = []
-            # for gene in genes_list:
             binary_string = ''.join(map(str, genes_list))
             substring_length = len(binary_string) // self._gens_count
             substrings = [binary_string[i:i + substring_length] for i in
                           range(0, len(binary_string), substring_length)]
             results = [func(substring) for substring in substrings]
-            # print(results)
-            # result = func(substrings)
-            # results.append(result)
 
             results = np.array(results)
             return results
@@ -185,17 +179,6 @@ class Population:
                 return shifted_value
             return 1 / shifted_value
 
-        # def f(ga_instance, solution, solution_idx):
-        #     return 1 / func(solution)
-
-        num_generations = 100
-        sol_per_pop = 80
-        num_parents_mating = 50
-        # boundary = func.suggested_bounds() #możemy wziąć stąd zakresy
-        init_range_low = -32.768
-        init_range_high = 32.768
-        mutation_num_genes = 1
-        parent_selection_type = "tournament"
         crossover = PygadCrossoverFactory.get_crossover(self._crossover_name)
         selection = PygadSelectionFactory.get_selection(self._selection_name)
         mutation = PygadMutationFactory.get_mutation(self._mutation_name)
