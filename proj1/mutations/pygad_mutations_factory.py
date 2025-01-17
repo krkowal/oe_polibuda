@@ -7,6 +7,7 @@ from proj1 import constants
 def one_point_mutation(offspring, ga_instance):
     pass
 
+
 def uniform_mutation(offspring, ga_instance):
     init_range_low = ga_instance.init_range_low
     init_range_high = ga_instance.init_range_high
@@ -17,6 +18,7 @@ def uniform_mutation(offspring, ga_instance):
         genotype[position] = np.random.uniform(init_range_low, init_range_high)
 
     return offspring
+
 
 def gaussian_mutation(offspring, ga_instance):
     init_range_low = ga_instance.init_range_low
@@ -40,9 +42,6 @@ def gaussian_mutation(offspring, ga_instance):
 
     return offspring
 
-
-
-def one_point_mutation()
 
 class PygadMutationFactory:
     @staticmethod
